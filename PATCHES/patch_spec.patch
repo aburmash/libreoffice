@@ -1,0 +1,31 @@
+diff --git a/SPECS/libreoffice.spec b/SPECS/libreoffice.spec
+index c35834b..ab4f1b3 100644
+--- a/SPECS/libreoffice.spec
++++ b/SPECS/libreoffice.spec
+@@ -8,7 +8,7 @@
+ %global libo_buildfix %{nil}
+ # rhbz#715152 state vendor
+ %if 0%{?rhel}
+-%global vendoroption --with-vendor="Red Hat, Inc."
++%global vendoroption --with-vendor="OpenELA Enterprise Software Foundation"
+ %endif
+ %if 0%{?fedora}
+ %global vendoroption --with-vendor="The Fedora Project"
+@@ -1017,17 +1017,6 @@ rm -rf git-hooks */git-hooks
+ %global __scm git_am
+ %__scm_setup_git_am
+ 
+-#Customize Palette to add Red Hat colours
+-(head -n -1 extras/source/palettes/standard.soc && \
+- echo -e '  <draw:color draw:name="Red Hat 1" draw:color="#cc0000"/>
+-  <draw:color draw:name="Red Hat 2" draw:color="#0093d9"/>
+-  <draw:color draw:name="Red Hat 3" draw:color="#ff8d00"/>
+-  <draw:color draw:name="Red Hat 4" draw:color="#abb400"/>
+-  <draw:color draw:name="Red Hat 5" draw:color="#4e376b"/>' && \
+- tail -n 1 extras/source/palettes/standard.soc) > redhat.soc
+-mv -f redhat.soc extras/source/palettes/standard.soc
+-git commit -q -a -m 'add Red Hat colors to palette'
+-
+ # apply patches
+ %autopatch -M 99
+ %if 0%{?rhel}
