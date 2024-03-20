@@ -57,7 +57,7 @@ Summary:              Free Software Productivity Suite
 Name:                 libreoffice
 Epoch:                1
 Version:              %{libo_version}.1
-Release:              8%{?libo_prerelease}%{?dist}
+Release:              12%{?libo_prerelease}%{?dist}
 License:              (MPLv1.1 or LGPLv3+) and LGPLv3 and LGPLv2+ and BSD and (MPLv1.1 or GPLv2 or LGPLv2 or Netscape) and Public Domain and ASL 2.0 and MPLv2.0 and CC0
 URL:                  http://www.libreoffice.org/
 
@@ -278,6 +278,24 @@ Patch22:              0001-CVE-2022-26305-compare-authors-using-Thumbprint.patch
 Patch23:              0002-CVE-2022-26307-make-hash-encoding-match-decoding.patch
 Patch24:              0003-CVE-2022-26306-add-Initialization-Vectors-to-passwor.patch
 Patch25:              0004-CVE-2022-2630-6-7-add-infobar-to-prompt-to-refresh-t.patch
+Patch26:              0005-CVE-2022-3140-Filter-out-unwanted-command-URIs.patch
+Patch27:              0001-CVE-2022-38745.patch
+Patch28:              0001-Don-t-use-Library_tl-in-URE-libraries.patch
+Patch29:              0001-URE-Library_boostrap-should-not-depend-on-Library_co.patch
+Patch30:              0001-Obtain-actual-0-parameter-count-for-OR-AND-and-1-par.patch
+Patch31:              0002-Stack-check-safety-belt-before-fishing-in-muddy-wate.patch
+Patch32:              0003-Always-push-a-result-even-if-it-s-only-an-error.patch
+Patch33:              0001-set-Referer-on-loading-IFrames.patch
+Patch34:              0002-put-floating-frames-under-managed-links-control.patch
+Patch35:              0003-assume-IFrame-script-macro-support-isn-t-needed.patch
+Patch36:              0001-disable-script-dump.patch
+Patch37:              0001-CVE-2023-6185-escape-url-passed-to-gstreamer.patch
+Patch38:              0001-CVE-2023-6186-add-some-protocols-that-don-t-make-sense-as-floating.patch
+Patch39:              0002-CVE-2023-6186-warn-about-exotic-protocols-as-well.patch
+Patch40:              0003-CVE-2023-6186-default-to-ignoring-libreoffice-special-purpose-prot.patch
+Patch41:              0004-CVE-2023-6186-reuse-AllowedLinkProtocolFromDocument-in-writer.patch
+Patch42:              0005-CVE-2023-6186-reuse-AllowedLinkProtocolFromDocument-in-impress-dra.patch
+Patch43:              0006-CVE-2023-6186-backporting.patch
 
 # not upstreamed
 Patch500:             0001-disable-libe-book-support.patch
@@ -1020,6 +1038,10 @@ rm -rf git-hooks */git-hooks
 # apply patches
 %autopatch -M 99
 %if 0%{?rhel}
+# Workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1954999
+# From https://src.fedoraproject.org/rpms/python3.9/pull-request/60
+# Make at least a local rhpkg prep on Fedora work..
+%{?!apply_patch:%define apply_patch(qp:m:) {%__apply_patch %**}}
 %apply_patch -q %{PATCH500}
 %endif
 
@@ -1038,6 +1060,9 @@ sed -i -e /CppunitTest_dbaccess_hsqlbinary_import/d dbaccess/Module_dbaccess.mk
 sed -i -e /CppunitTest_vcl_svm_test/d vcl/Module_vcl.mk
 sed -i -e /CustomTarget_uno_test/d testtools/Module_testtools.mk
 %endif
+# Broken with system nss. See also upstream commit ac519af951541b7313a4c98e1bee463bf47356be
+sed -i -e '/^\s*CPPUNIT_TEST(testInsertCertificate_PEM_ODT);/d' desktop/qa/desktop_lib/test_desktop_lib.cxx
+sed -i -e '/^\s*CPPUNIT_TEST(testInsertCertificate_PEM_DOCX);/d' desktop/qa/desktop_lib/test_desktop_lib.cxx
 
 git commit -q -a -m 'temporarily disable failing tests'
 
@@ -2263,9 +2288,26 @@ gtk-update-icon-cache -q %{_datadir}/icons/hicolor &>/dev/null || :
 %{_includedir}/LibreOfficeKit
 
 %changelog
-* Thu Jan 25 2024 Release Engineering <releng@openela.org> - %{libo_version}.1
+* Wed Mar 20 2024 Release Engineering <releng@openela.org> - %{libo_version}.1
 - Remove Red Hat branding
 - Change vendor to RESF
+
+* Fri Mar 08 2024 Eike Rathke <erack@redhat.com> - 1:7.1.8.1-12
+- Fix CVE-2023-6185 escape url passed to gstreamer
+- Fix CVE-2023-6186 check link target protocols
+
+* Tue Jun 20 2023 Stephan Bergmann <sbergman@redhat.com> - 1:7.1.8.1-11
+- Resolves: rhbz#2210193 CVE-2023-0950 Array Index UnderFlow in Calc Formula
+  Parsing
+- Resolves: rhbz#2210197 CVE-2023-2255 libreoffice: Remote documents loaded
+  without prompt via IFrame
+- Resolves: rhbz#2208510 CVE-2023-1183 libreoffice: Arbitrary File Write
+
+* Tue May 16 2023 Stephan Bergmann <sbergman@redhat.com> - 1:7.1.8.1-10
+- Fix erroneous libreoffice-ure dependencies
+
+* Wed Apr 12 2023 Caolán McNamara <caolanm@redhat.com> - 1:7.1.8.1-9
+- Resolves: rhbz#2182392 CVE-2022-38745
 
 * Thu Oct 20 2022 Caolán McNamara <caolanm@redhat.com> - 1:7.1.8.1-8
 - Resolves: rhbz#2134759 Untrusted Macros
