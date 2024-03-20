@@ -11,7 +11,7 @@ index c35834b..ab4f1b3 100644
  %endif
  %if 0%{?fedora}
  %global vendoroption --with-vendor="The Fedora Project"
-@@ -1017,17 +1017,6 @@ rm -rf git-hooks */git-hooks
+@@ -1035,17 +1035,6 @@
  %global __scm git_am
  %__scm_setup_git_am
  
